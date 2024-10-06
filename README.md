@@ -12,7 +12,8 @@
 #### User can follow or unfollow other users.
 #### User can see his followers and who he is followings.
 #### note that post and comment use slug.
-
+## See the Documentaion on Postman-
+https://apis-testers.postman.co/workspace/Ahmed's-Public-APIs~e77aa70c-4ba9-48f4-91be-2cf4be668221/collection/36516165-5783192b-e091-4a49-bfc6-c74b89caa9c2
 ## Usage
 #### Clone the repository-
 ```html
