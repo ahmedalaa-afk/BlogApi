@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SendFollowerNotificationEvent;
+use App\Events\SendUserCreatePostNotificationEvent;
 use App\Helpers\ApiResponse;
 use App\Http\Resources\FavoriteResource;
 use App\Http\Resources\PostResource;
@@ -10,9 +12,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Http\Traits\Slugable;
+use App\Notifications\FollowersNotification;
+use App\Notifications\UserCreatePostNotification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Tags\Tag;
+
 class PostController extends Controller
 {
     use Slugable;
@@ -103,11 +109,16 @@ class PostController extends Controller
         if (!empty($request->tags)) {
             $tags = explode(' ', $request->tags);
             $normalizedTags = array_map(function ($tag) {
-                return strtolower(ltrim($tag,'#'));
+                return strtolower(ltrim($tag, '#'));
             }, $tags);
             $post->attachTags($normalizedTags);
         }
 
+        $user = auth()->user();
+        $followers = $user->followers()->get();
+        Notification::send($followers, new UserCreatePostNotification($user));
+        
+        SendUserCreatePostNotificationEvent::dispatch();
 
         return ApiResponse::sendResponse(201, 'Post created successfully', new PostResource($post));
     }
@@ -166,7 +177,7 @@ class PostController extends Controller
         if (!empty($request->tags)) {
             $tags = explode(' ', $request->tags);
             $normalizedTags = array_map(function ($tag) {
-                return strtolower(ltrim($tag,'#'));
+                return strtolower(ltrim($tag, '#'));
             }, $tags);
             return $normalizedTags;
             $post->syncTags($normalizedTags);
@@ -225,11 +236,10 @@ class PostController extends Controller
             } else {
                 $posts = Post::where('content', 'like', '%' . $request->search . '%')->paginate(5);
             }
-
         }
 
 
-        
+
 
         if (count($posts) > 0) {
             if ($posts->total() > $posts->perPage()) {
