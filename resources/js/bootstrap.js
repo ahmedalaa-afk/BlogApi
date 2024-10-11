@@ -30,6 +30,4 @@ window.Echo = new Echo({
     cluster: "mt1",
 });
 
-window.Echo.channel(`send-follower-notification`).listen(".App\\Events\\SendFollowerNotificationEvent", (e) => {
 
-});

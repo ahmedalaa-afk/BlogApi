@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewFollowerNotificationEvent;
 use App\Helpers\ApiResponse;
 use App\Http\Resources\FollowerResource;
 use App\Models\Follower;
 use App\Models\User;
+use App\Notifications\NewFollowerNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 
 class FollowController extends Controller
@@ -54,10 +57,18 @@ class FollowController extends Controller
 
         $follower = Auth::user();
 
+        if ($follower->followings->contains('email', $user->email)) {
+            return ApiResponse::sendResponse(200, 'Already following this user', []);
+        }
+
         Follower::create([
             'follower_id' => $follower->id,
             'user_id' => $user->id,
         ]);
+
+        Notification::send($user, new NewFollowerNotification($follower));
+        NewFollowerNotificationEvent::dispatch();
+
         return ApiResponse::sendResponse(200, 'Followed Successfully', new FollowerResource($user));
     }
     public function unfollow(Request $request)
