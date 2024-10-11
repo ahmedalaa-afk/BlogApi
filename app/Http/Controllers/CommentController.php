@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewCommentNotificationEvent;
 use App\Helpers\ApiResponse;
 use App\Http\Resources\CommentResource;
 use App\Http\Traits\Slugable;
 use App\Models\Comment;
 use App\Models\Post;
+use App\Notifications\NewCommentNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 
 class CommentController extends Controller
@@ -34,6 +37,9 @@ class CommentController extends Controller
             'slug' => $this->slug(),
             'user_id' => $request->user()->id,
         ]);
+
+        Notification::send($post->user,new NewCommentNotification(auth()->user()));
+        NewCommentNotificationEvent::dispatch();
 
         return ApiResponse::sendResponse(201, 'Comment created successfully', new CommentResource($comment));
     }
