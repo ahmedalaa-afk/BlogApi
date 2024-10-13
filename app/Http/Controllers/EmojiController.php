@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
+use App\Http\Requests\StoreEmojiRequest;
 use App\Http\Resources\EmojiResource;
 use App\Models\Emoji;
 use App\Models\Post;
@@ -11,24 +12,8 @@ use Illuminate\Support\Facades\Validator;
 
 class EmojiController extends Controller
 {
-    public function store(Request $request)
+    public function store(StoreEmojiRequest $request)
     {
-        $validator = Validator::make(
-            $request->all(),
-            [
-                'emoji' => 'required|string|in:like,dislike',
-                'slug' => 'required|string|exists:posts,slug'
-            ],
-            [],
-            [
-                'emoji' => 'Emoji',
-                'slug' => 'Slug',
-            ]
-        );
-
-        if ($validator->fails()) {
-            return ApiResponse::sendResponse(204, 'Validation Erros', $validator->errors()->messages());
-        }
 
         // get post
         $post = Post::where('slug', $request->slug)->first();
