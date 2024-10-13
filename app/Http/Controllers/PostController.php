@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Events\SendFollowerNotificationEvent;
 use App\Events\SendUserCreatePostNotificationEvent;
 use App\Helpers\ApiResponse;
+use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\FavoriteResource;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
@@ -49,23 +51,8 @@ class PostController extends Controller
         return ApiResponse::sendResponse(404, 'No posts found', []);
     }
 
-    public function store(Request $request)
+    public function store(StorePostRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'content' => ['nullable', 'string'],
-            'photo.*' => ['nullable', 'image', 'mimes:png,jpg,jpeg,gif,icon,pdf,doc,docx'],
-            'video.*' => ['nullable', 'mimes:mp4,mov,avi', 'max:20000'],
-            'tags' => ['nullable', 'string']
-        ], [], [
-            'content' => 'Content',
-            'photo' => 'Photo',
-            'video' => 'Video',
-            'tags' => 'Tags'
-        ]);
-
-        if ($validator->fails()) {
-            return ApiResponse::sendResponse(400, 'Validation Error', $validator->errors()->messages());
-        }
         if (empty($request->content) && empty($request->photo) && empty($request->video)) {
             return ApiResponse::sendResponse(400, 'Please Enter Content or Photo or Video', []);
         }
@@ -117,33 +104,14 @@ class PostController extends Controller
         $user = auth()->user();
         $followers = $user->followers()->get();
         Notification::send($followers, new UserCreatePostNotification($user));
-        
+
         SendUserCreatePostNotificationEvent::dispatch();
 
         return ApiResponse::sendResponse(201, 'Post created successfully', new PostResource($post));
     }
 
-    public function update(Request $request)
+    public function update(UpdatePostRequest $request)
     {
-
-        $validator = Validator::make($request->all(), [
-            'content' => ['required', 'string'],
-            'slug' => ['required', 'string', 'exists:posts,slug'],
-            'photo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,gif,icon,pdf,doc,docx'],
-            'video' => ['nullable', 'mimes:mp4,mov,avi', 'max:20000'],
-            'tags' => ['nullable',]
-        ], [], [
-            'content' => 'Content',
-            'slug' => 'Slug',
-            'photo' => 'Photo',
-            'video' => 'Video',
-            'tags' => 'Tags'
-        ]);
-
-        if ($validator->fails()) {
-            return ApiResponse::sendResponse(400, 'Validation Error', $validator->errors()->messages());
-        }
-
         $post = Post::where('slug', $request->slug)->first();
 
         if ($request->user()->id != $post->user->id) {
@@ -193,16 +161,6 @@ class PostController extends Controller
 
     public function delete(Request $request)
     {
-
-        $validator = Validator::make($request->all(), [
-            'slug' => ['required', 'string', 'exists:posts,slug'],
-        ], [], [
-            'slug' => 'Slug',
-        ]);
-
-        if ($validator->fails()) {
-            return ApiResponse::sendResponse(400, 'Validation Error', $validator->errors()->messages());
-        }
         $post = Post::where('slug', $request->slug)->first();
 
         if ($request->user()->id != $post->user->id) {
@@ -218,15 +176,6 @@ class PostController extends Controller
 
     public function search(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'search' => ['required', 'string'],
-        ], [], [
-            'search' => 'Search',
-        ]);
-
-        if ($validator->fails()) {
-            return ApiResponse::sendResponse(400, 'Validation Error', $validator->errors()->messages());
-        }
         if ($request->search) {
             $searchQuery = $request->search;
 
@@ -267,20 +216,6 @@ class PostController extends Controller
 
     public function favorite(Request $request)
     {
-        $validator = Validator::make(
-            $request->all(),
-            [
-                'slug' => 'required|string|exists:posts,slug',
-            ],
-            [],
-            [
-                'slug' => 'Slug',
-            ]
-        );
-
-        if ($validator->fails()) {
-            return ApiResponse::sendResponse(400, 'Validation Error', $validator->errors()->messages());
-        }
 
         $post = Post::where('slug', $request->slug)->first();
 
@@ -296,20 +231,6 @@ class PostController extends Controller
 
     public function getFavoritePosts(Request $request)
     {
-        $validator = Validator::make(
-            $request->all(),
-            [
-                'email' => 'required|exists:users,email',
-            ],
-            [],
-            [
-                'email' => 'Email',
-            ]
-        );
-
-        if ($validator->fails()) {
-            return ApiResponse::sendResponse(400, 'Validation Error', $validator->errors()->messages());
-        }
 
         $user = auth()->user();
 
