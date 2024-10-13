@@ -16,9 +16,11 @@ class CommentResource extends JsonResource
     {
         return [
             'comment' => $this->comment,
-            'comment slug' => $this->slug,
-            'author name' => $this->user->name,
-            'author email' => $this->user->email,
+            'comment_slug' => $this->slug,
+            'auther' => [
+                'name' => $this->user->name,
+                'email' => $this->user->email,
+            ],
         ];
     }
 }
