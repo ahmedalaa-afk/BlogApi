@@ -16,9 +16,11 @@ class EmojiResource extends JsonResource
     {
         return [
             'emoji' => $this->emoji,
-            'owner name' => $this->user->name,
-            'owner email' => $this->user->email,
-            'post slug' => $this->emojiable->slug
+            'owner' => [
+                'name' => $this->user->name,
+                'email' => $this->user->email,
+            ],
+            'post_slug' => $this->emojiable->slug
         ];
     }
 }

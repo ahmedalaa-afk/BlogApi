@@ -31,15 +31,15 @@ class PostController extends Controller
             if ($posts->total() > $posts->perPage()) {
                 $data = [
                     'data' => PostResource::collection($posts),
-                    'pagination links' => [
-                        'current page' => $posts->currentPage(),
-                        'per page' => $posts->perPage(),
+                    'pagination_links' => [
+                        'current_page' => $posts->currentPage(),
+                        'per_page' => $posts->perPage(),
                         'total' => $posts->total(),
                         'links' => [
-                            'first page' => $posts->url(1),
-                            'next page' => $posts->nextPageUrl(),
-                            'prev page' => $posts->previousPageUrl(),
-                            'last page' => $posts->url($posts->lastPage()),
+                            'first_page' => $posts->url(1),
+                            'next_page' => $posts->nextPageUrl(),
+                            'prev_page' => $posts->previousPageUrl(),
+                            'last_page' => $posts->url($posts->lastPage()),
                         ],
                     ],
                 ];

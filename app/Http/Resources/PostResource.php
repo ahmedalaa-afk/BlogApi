@@ -20,21 +20,23 @@ class PostResource extends JsonResource
 
         return [
             'content' => $this->content,
-            'post slug' => $this->slug,
-            'author name' => $this->user->name,
-            'author email' => $this->user->email,
+            'post_slug' => $this->slug,
+            'author_name' => $this->user->name,
+            'author_email' => $this->user->email,
             'date' => $this->created_at->diffForHumans(),
             'images' => $this->images->pluck('path'),
             'videos' => $this->videos->pluck('path'),
             'tags' => $this->tags->pluck('name'),
-            'user emoji' => $emoji ? [
+            'user_emoji' => $emoji ? [
                 'emoji' => $emoji->emoji,
-                'owner name' => $emoji->user->name,
-                'owner email' => $emoji->user->email,
+                'owner' => [
+                    'name' => $this->user->name,
+                    'email' => $this->user->email,
+                ],
                 'created_at' => $emoji->created_at->diffForHumans(),
-            ] : 'no emoji',
-            'likes count' => $this->countLikes(),
-            'dislikes count' => $this->countDislikes(),
+            ] : 'no_emoji',
+            'likes_count' => $this->countLikes(),
+            'dislikes_count' => $this->countDislikes(),
         ];
     }
 }
