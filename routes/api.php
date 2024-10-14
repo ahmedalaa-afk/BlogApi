@@ -40,41 +40,38 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
 Route::prefix('user')->middleware('auth:sanctum')->group(function () {
     // Profile Section
     Route::prefix('profile')->controller(ProfileController::class)->group(function () {
-        Route::post('/', 'index');
+        Route::get('/', 'index');
         Route::post('/updateName', 'updateName');
         Route::post('/updateEmail', 'updateEmail');
         Route::post('/updatePassword', 'updatePassword');
-        Route::post('/userPosts', 'userPosts');
-        Route::post('/search', 'search');
+        Route::get('/userPosts', 'userPosts');
+        Route::get('/search', 'search');
     });
     // Follow Section
     Route::controller(FollowController::class)->group(function (){
-        Route::post('/followers', 'followers');
-        Route::post('/followings', 'followings');
+        Route::get('/followers', 'followers');
+        Route::get('/followings', 'followings');
         Route::post('/follow', 'follow');
         Route::post('/unfollow', 'unfollow');
     });
     // Post Section
     Route::prefix('posts')->controller(PostController::class)->group(function () {
-        Route::post('/', 'index');
+        Route::get('/', 'index');
         Route::post('/store', 'store');
         Route::post('/update', 'update');
-        Route::post('/delete', 'delete');
-        Route::post('/search', 'search');
+        Route::delete('/delete', 'delete');
+        Route::get('/search', 'search');
         Route::post('/favorite', 'favorite');
-        Route::post('/getFavoritePosts', 'getFavoritePosts');
+        Route::get('/getFavoritePosts', 'getFavoritePosts');
         // Comment Section
         Route::prefix('comments')->controller(CommentController::class)->group(function () {
-            Route::post('/', 'index');
             Route::post('/store', 'store');
-            Route::post('/update', 'update');
-            Route::post('/delete', 'delete');
+            Route::delete('/delete', 'delete');
         });
 
         // Emoji Section
         Route::prefix('emoji')->controller(EmojiController::class)->group(function () {
             Route::post('/store', 'store');
-            Route::post('/delete', 'delete');
         });
     });
 });

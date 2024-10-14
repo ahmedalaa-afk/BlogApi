@@ -11,9 +11,9 @@ class Comment extends Model
 
     protected $fillable = ['comment', 'slug','user_id'];
 
-    public function commentable()
+    public function comment()
     {
-        return $this->morphTo();
+        return $this->belongsTo(Post::class);
     }
 
     public function user()
